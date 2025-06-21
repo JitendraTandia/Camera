@@ -1,4 +1,4 @@
-import { Link, useLocalSearchParams } from "expo-router";
+import { Link, useLocalSearchParams, Stack } from "expo-router";
 import { Text, View } from "react-native";
 
 export default function ImageScreen() {
@@ -6,6 +6,7 @@ export default function ImageScreen() {
 
   return (
     <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
+      <Stack.Screen options={{ title: "Image: " + name }} />
       <Text style={{ fontSize: 24, fontWeight: "600" }}>
         Image Details for: {name}
       </Text>

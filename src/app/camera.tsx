@@ -13,8 +13,12 @@ import {
   StyleSheet,
   Pressable,
   Image,
+  Button,
 } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { SafeAreaView } from "react-native-safe-area-context";
+import path from "path";
+import * as FileSystem from "expo-file-system";
 
 export default function CameraScreen() {
   const [permission, requestPermission] = useCameraPermissions();
@@ -38,26 +42,47 @@ export default function CameraScreen() {
     setPicture(res);
   };
 
+  const saveFile = async (uri: string) => {
+    // save file
+    const filename = path.parse(uri).base;
+    await FileSystem.copyAsync({
+      from: uri,
+      to: FileSystem.documentDirectory + filename,
+    });
+
+    setPicture(undefined);
+    router.back();
+  };
+
   if (!permission?.granted) {
     return <ActivityIndicator />;
   }
 
   if (picture) {
-    <View>
-      <Image
-        source={{ uri: picture.uri }}
-        style={{ width: "100%", height: "100%" }}
-      />
-      <MaterialIcons
-        onPress={() => {
-          setPicture(undefined);
-        }}
-        name="close"
-        size={35}
-        color={"white"}
-        style={{ position: "absolute", top: 50, left: 20 }}
-      />
-    </View>;
+    return (
+      <View style={{ flex: 1 }}>
+        <Image
+          source={{ uri: picture.uri }}
+          style={{ width: "100%", flex: 1 }}
+        />
+
+        <View style={{ padding: 10 }}>
+          <SafeAreaView edges={["bottom"]}>
+            <Button title="save" onPress={() => saveFile(picture.uri)} />
+          </SafeAreaView>
+        </View>
+
+        <MaterialIcons
+          onPress={() => {
+            setPicture(undefined);
+          }}
+          name="close"
+          size={35}
+          color={"white"}
+          style={{ position: "absolute", top: 50, left: 20 }}
+        />
+      </View>
+    );
   }
 
   return (
@@ -103,7 +128,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: "00000099",
+    backgroundColor: "#00000099",
   },
   recordButton: {
     width: 50,
